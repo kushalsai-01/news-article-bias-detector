@@ -1,17 +1,18 @@
 # News Article Bias Detector
 
-This project aims to detect bias in news articles using Machine Learning (ML) and Natural Language Processing (NLP) techniques. It utilizes models like BERT and other ML algorithms to classify articles as biased or unbiased. The project offers insights into article bias and allows users to understand how bias manifests in various news sources.
+## Overview
+This project uses machine learning techniques (such as Naïve Bayes, SVM, Random Forest, and BERT) to detect bias in news articles. The model is based on the BERT architecture, but you can easily replace it with your own trained model.
 
-## Features
-- **Bias Detection**: Detects bias in news articles using NLP models.
-- **BERT Model**: Uses BERT for text classification and bias detection.
-- **Web Interface**: User-friendly interface to input articles and get bias classification.
+## Key Files
+- **`app.py`**: The main application file that runs the bias detection.
+- **`models/bert_model/`**: Directory containing the pre-trained BERT model and its configuration.
+- **`models/bias_detection.py`**: The script used to detect bias in news articles using the trained model.
 
-## Installation
+## Requirements
+Before you begin, ensure you have the following installed:
+- Python 3.x
+- Required libraries (listed in `requirements.txt`)
 
-To set up the project locally, follow these steps:
-
-1. Clone this repository:
-
-   ```bash
-   git clone https://github.com/kushalsai-01/news-article-bias-detector.git
+Run the following command to install the dependencies:
+```bash
+pip install -r requirements.txt
