@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Bias Analyzer | AI-Powered Media Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #7209b7;
+            --success-color: #06d6a0;
+            --warning-color: #ffd166;
+            --danger-color: #ef476f;
+            --background-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-primary: #2b2d42;
+            --text-secondary: #8d99ae;
+            --border-color: #edf2f7;
+            --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --gradient-primary: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            --gradient-accent: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+            --gradient-footer: linear-gradient(135deg, #2b2d42, #1a1b2e);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            width: 100%;
+        }
+
+        /* Header Styles */
+        .header {
+            background: var(--gradient-primary);
+            color: white;
+            padding: 3rem 0 6rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 0;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.05);
+            z-index: 0;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            background: white;
+            color: var(--primary-color);
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .brand-text h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: white;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            width: 100%;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 4rem 0 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            max-width: 600px;
+            margin: 0 auto;
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            margin-top: -4rem;
+            padding-bottom: 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .analysis-form {
+            margin-bottom: 2rem;
+        }
+
+        .input-container {
+            position: relative;
+        }
+
+        .article-input {
+            width: 100%;
+            min-height: 220px;
+            padding: 1.8rem;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 1rem;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.3s ease;
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .article-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.15);
+        }
+
+        .input-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1.5rem;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(67, 97, 238, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-icon {
+            font-size: 1.1rem;
+        }
+
+        .loading-spinner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            opacity: 0;
+        }
+
+        @keyframes spin {
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        .btn.loading .btn-text {
+            opacity: 0;
+        }
+
+        .btn.loading .btn-icon {
+            opacity: 0;
+        }
+
+        .btn.loading .loading-spinner {
+            opacity: 1;
+        }
+
+        .word-counter {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .counter-icon {
+            color: var(--primary-color);
+        }
+
+        /* Results Styles */
+        .results-card {
+            margin-top: 2rem;
+            animation: slideUp 0.6s ease;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .results-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1.5rem;
+        }
+
+        .confidence-badge {
+            background: var(--gradient-accent);
+            color: white;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 8px rgba(114, 9, 183, 0.25);
+        }
+
+        .result-details {
+            padding: 0 1rem;
+        }
+
+        .bias-meter-container {
+            margin: 2rem 0;
+        }
+
+        .bias-meter-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .bias-meter {
+            height: 10px;
+            border-radius: 5px;
+            background: #e9ecef;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .meter-bar {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 1s ease;
+            position: relative;
+            border-radius: 5px;
+        }
+
+        .meter-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0) 100%);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .bias-category {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .category-label {
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-label.biased {
+            background: rgba(239, 71, 111, 0.1);
+            color: var(--danger-color);
+            border: 1px solid rgba(239, 71, 111, 0.2);
+        }
+
+        .category-label.neutral {
+            background: rgba(6, 214, 160, 0.1);
+            color: var(--success-color);
+            border: 1px solid rgba(6, 214, 160, 0.2);
+        }
+
+        /* News Importance Section Styles */
+        .news-importance-section {
+            background: #f9fafb;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+
+        .news-importance-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .section-icon {
+            color: var(--accent-color);
+        }
+
+        .news-cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .news-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .news-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .news-card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+
+        .news-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+            color: var(--text-primary);
+        }
+
+        .news-card-text {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .news-info-text {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Tips Section */
+        .media-literacy-tips {
+            margin-top: 3rem;
+            background: linear-gradient(135deg, rgba(67, 97, 238, 0.1), rgba(114, 9, 183, 0.1));
+            border-radius: 16px;
+            padding: 2rem;
+        }
+
+        .media-literacy-tips h4 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            color: var(--text-primary);
+        }
+
+        .tips-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .tip-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .tip-number {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .tip-content {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            margin-top: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(58, 12, 163, 0.05), rgba(67, 97, 238, 0.05));
+            border-radius: 16px;
+        }
+
+        .faq-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .faq-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+        }
+
+        .faq-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .faq-list {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .faq-question i {
+            color: var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .faq-question.active i {
+            transform: rotate(180deg);
+        }
+
+        .faq-answer {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+        }
+
+        .faq-answer.active {
+            padding: 0 1.5rem 1.5rem;
+            max-height: 500px;
+        }
+
+        .faq-answer p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--gradient-footer);
+            color: white;
+            padding: 4rem 0 2rem;
+            margin-top: auto;
+            position: relative;
+            overflow: hidden;
+        }
+
+        footer::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to bottom right, transparent 49%, var(--gradient-footer) 50%);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-column h4 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 0.8rem;
+        }
+
+        .footer-column h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: var(--primary-color);
+            border-radius: 3px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .footer-link:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .footer-about p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+            line-height: 1.7;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary-color);
+            transform: translateY(-5px);
+        }
+
+        .footer-contact p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .contact-icon {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-top: 0.2rem;
+        }
+
+        .newsletter-form {
+            display: flex;
+            margin-top: 1.5rem;
+            position: relative;
+        }
+
+        .newsletter-input {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px 0 0 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .newsletter-btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            padding: 0 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .newsletter-btn:hover {
+            background: var(--secondary-color);
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .copyright {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-bottom-link {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .footer-bottom-link:hover {
+            color: white;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1.5rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .logo-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 2rem;
+            }
+            
+            .brand-text h1 {
+                font-size: 1.5rem;
+            }
+            
+            .hero h2 {
+                font-size: 2rem;
+            }
+            
+            .glass-card {
+                padding: 1.5rem;
+            }
+            
+            .article-input {
+                min-height: 180px;
+                padding: 1.5rem;
+            }
+            
+            .input-footer {
+                flex-direction: column-reverse;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .footer-grid {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer-bottom-links {
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .tips-container {
+                grid-template-columns: 1fr;
+            }
+
+            .news-cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .newsletter-form {
+                flex-direction: column;
+            }
+
+            .newsletter-input {
+                border-radius: 8px;
+                margin-bottom: 0.5rem;
+            }
+
+            .newsletter-btn {
+                border-radius: 8px;
+                padding: 0.8rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page-wrapper">
+        <header class="header">
+            <div class="container">
+                <nav class="nav-container">
+                    <div class="logo-container">
+                        <div class="logo-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <div class="brand-text">
+                            <h1>News Bias Analyzer</h1>
+                            <p class="tagline">AI-Powered Media Analysis</p>
+                        </div>
+                    </div>
+                    <div class="nav-links">
+                        <a href="#" class="nav-link">Home</a>
+                        <a href="#" class="nav-link">About</a>
+                        <a href="#" class="nav-link">How It Works</a>
+                        <a href="#" class="nav-link">Contact</a>
+                    </div>
+                </nav>
+                
+                <div class="hero">
+                    <h2>Decode Media Bias with AI</h2>
+                    <p>Our advanced AI analyzes news articles to detect bias and provide objective insights into media coverage</p>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="container">
+                <div class="glass-card">
+                    <form method="POST" class="analysis-form">
+                        <div class="input-container">
+                            <textarea name="news_article" placeholder="Paste news article here..." class="article-input">{{ text }}</textarea>
+                            <div class="input-footer">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-search btn-icon"></i>
+                                    <span class="btn-text">Analyze Article</span>
+                                    <div class="loading-spinner"></div>
+                                </button>
+                                <div class="word-counter">
+                                    <i class="fas fa-file-alt counter-icon"></i>
+                                    <span>Words: 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    {% if result %}
+                    <section class="results-card">
+                        <div class="results-header">
+                            <h2>Analysis Results</h2>
+                            <div class="confidence-badge">
+                                <i class="fas fa-chart-pie"></i> 
+                                {{ "%.1f"|format(result['score'] * 100) }}% Confidence
+                            </div>
+                        </div>
+                        
+                        <div class="result-details">
+                            <div class="bias-meter-container">
+                                <div class="bias-meter-label">
+                                    <span>Unbiased</span>
+                                    <span>Biased</span>
+                                </div>
+                                <div class="bias-meter">
+                                    <div class="meter-bar" style="width: {{ result['score'] * 100 }}%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bias-category">
+                                <div class="category-label {{ 'biased' if result['label'] == 'Biased' else 'neutral' }}">
+                                    <i class="fas {{ 'fa-exclamation-circle' if result['label'] == 'Biased' else 'fa-check-circle' }}"></i>
+                                    {{ result['label'] }}
+                                </div>
+                            </div>
+                            
+                            <!-- New section about importance of news in life -->
+                            <div class="news-importance-section">
+                                <h3>
+                                    <i class="fas fa-newspaper section-icon"></i>
+                                    The Importance of Unbiased News
+                                </h3>
+                                
+                                <p class="news-info-text">
+                                    In today's information-rich world, understanding media bias is essential for making informed decisions. 
+                                    Quality news helps us navigate complex issues, participate in democratic processes, and maintain a well-rounded worldview.
+                                </p>
+                                
+                                <div class="news-cards-container">
+                                    <div class="news-card">
+                                        <div class="news-card-icon" style="background: rgba(67, 97, 238, 0.1); color: #4361ee;">
+                                            <i class="fas fa-brain"></i>
+                                        </div>
+                                        <h4 class="news-card-title">Informed Decision Making</h4>
+                                        <!-- Continuing from where the code was cut off -->
+                                        <p class="news-card-text">
+                                            Unbiased news helps you form opinions based on facts rather than emotions, enabling better personal and professional decisions.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="news-card">
+                                        <div class="news-card-icon" style="background: rgba(114, 9, 183, 0.1); color: #7209b7;">
+                                            <i class="fas fa-vote-yea"></i>
+                                        </div>
+                                        <h4 class="news-card-title">Civic Participation</h4>
+                                        <p class="news-card-text">
+                                            Access to balanced reporting is essential for healthy democratic participation and understanding diverse perspectives.
+                                        </p>
+                                    </div>
+                                    
+                                    <div class="news-card">
+                                        <div class="news-card-icon" style="background: rgba(6, 214, 160, 0.1); color: #06d6a0;">
+                                            <i class="fas fa-globe"></i>
+                                        </div>
+                                        <h4 class="news-card-title">Global Awareness</h4>
+                                        <p class="news-card-text">
+                                            Fair and balanced news coverage helps develop a more complete understanding of complex global issues and events.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Media literacy tips section -->
+                            <div class="media-literacy-tips">
+                                <h4>Media Literacy Tips</h4>
+                                <div class="tips-container">
+                                    <div class="tip-item">
+                                        <div class="tip-number">Tip #1</div>
+                                        <p class="tip-content">Compare multiple sources from different perspectives to get a more complete picture of events.</p>
+                                    </div>
+                                    <div class="tip-item">
+                                        <div class="tip-number">Tip #2</div>
+                                        <p class="tip-content">Check the publication date and context to ensure the information is current and relevant.</p>
+                                    </div>
+                                    <div class="tip-item">
+                                        <div class="tip-number">Tip #3</div>
+                                        <p class="tip-content">Look for loaded language and emotional appeals that might indicate bias.</p>
+                                    </div>
+                                    <div class="tip-item">
+                                        <div class="tip-number">Tip #4</div>
+                                        <p class="tip-content">Consider what information might be missing or underrepresented in the article.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    {% endif %}
+                </div>
+                
+                <!-- FAQ Section -->
+                <section class="faq-section">
+                    <div class="faq-header">
+                        <h3 class="faq-title">
+                            <i class="fas fa-question-circle"></i>
+                            Frequently Asked Questions
+                        </h3>
+                        <p class="faq-subtitle">Find answers to common questions about media bias and our analysis tool</p>
+                    </div>
+                    
+                    <div class="faq-list">
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                What is media bias? <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Media bias refers to the perceived prejudice or favoritism of journalists and news producers within the mass media in the selection of events and stories that are reported and how they are covered. This can manifest in various forms including political bias, corporate bias, religious bias, or other forms of bias that influence how news is presented to the public.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How does the News Bias Analyzer work? <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Our tool uses advanced natural language processing and machine learning algorithms to analyze news articles. It evaluates various linguistic patterns, sentiment, tone, choice of words, subject focus, and other indicators that might suggest bias in reporting. The analysis provides a bias score and classification to help readers understand the objectivity of the content they're consuming.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                How accurate is the bias detection? <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>While our tool is powered by sophisticated AI and trained on extensive datasets, it's important to understand that bias detection is not an exact science. The tool provides a high-level assessment with a confidence score to indicate the reliability of its analysis. We continuously improve our algorithms based on expert feedback and evolving understanding of media bias.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Why should I care about media bias? <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Media bias can significantly influence public opinion and shape societal perspectives on important issues. Being aware of bias helps you make more informed decisions, develop a more nuanced understanding of complex topics, and become a more critical consumer of news and information in general. In a democratic society, recognizing bias is essential for maintaining a well-informed citizenry.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="faq-item">
+                            <div class="faq-question">
+                                Can I analyze articles in languages other than English? <i class="fas fa-chevron-down"></i>
+                            </div>
+                            <div class="faq-answer">
+                                <p>Currently, the News Bias Analyzer is optimized for English language content. We're working on expanding our capabilities to include other major languages in future updates. Stay tuned for announcements about additional language support.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            <div class="container">
+                <div class="footer-grid">
+                    <div class="footer-column footer-about">
+                        <h4>About Us</h4>
+                        <p>News Bias Analyzer is dedicated to promoting media literacy and critical thinking by providing AI-powered tools that help readers identify bias in news coverage.</p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+                            <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-column">
+                        <h4>Quick Links</h4>
+                        <div class="footer-links">
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> Home</a>
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> About Us</a>
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> How It Works</a>
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> Media Literacy</a>
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> Blog</a>
+                            <a href="#" class="footer-link"><i class="fas fa-angle-right"></i> Contact</a>
+                        </div>
+                    </div>
+                    
+                    <div class="footer-column footer-contact">
+                        <h4>Contact Us</h4>
+                        <p>
+                            <i class="fas fa-map-marker-alt contact-icon"></i>
+                            <span>Dayananda Sagar College Of Engineering</span>
+                        </p>
+                        <p>
+                            <i class="fas fa-envelope contact-icon"></i>
+                            <span>gkushalsai2006@gmail.com</span>
+                        </p>
+                        <p>
+                            <i class="fas fa-phone-alt contact-icon"></i>
+                            <span>+91 8341422295</span>
+                        </p>
+                        <div class="newsletter">
+                            <h4>Subscribe Newsletter</h4>
+                            <form class="newsletter-form">
+                                <input type="email" placeholder="Enter your email" class="newsletter-input">
+                                <button type="submit" class="newsletter-btn">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="footer-bottom">
+                    <p class="copyright">&copy; 2025 News Bias Analyzer. All rights reserved.</p>
+                    <div class="footer-bottom-links">
+                        <a href="#" class="footer-bottom-link">Privacy Policy</a>
+                        <a href="#" class="footer-bottom-link">Terms of Service</a>
+                        <a href="#" class="footer-bottom-link">Cookie Policy</a>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- JavaScript for interactive elements -->
+    <script>
+        // Word Counter
+        const articleInput = document.querySelector('.article-input');
+        const wordCounter = document.querySelector('.word-counter span');
+        
+        function countWords() {
+            const text = articleInput.value.trim();
+            const wordCount = text ? text.split(/\s+/).length : 0;
+            wordCounter.textContent = `Words: ${wordCount}`;
+        }
+        
+        if (articleInput) {
+            articleInput.addEventListener('input', countWords);
+            // Count words on page load if there's text
+            countWords();
+        }
+        
+        // Form submission animation
+        const form = document.querySelector('.analysis-form');
+        const submitButton = document.querySelector('.btn-primary');
+        
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                submitButton.classList.add('loading');
+                // The form will naturally submit, this is just for the animation
+            });
+        }
+        
+        // FAQ Accordion
+        const faqQuestions = document.querySelectorAll('.faq-question');
+        
+        faqQuestions.forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isActive = question.classList.contains('active');
+                
+                // Close all other answers
+                document.querySelectorAll('.faq-answer').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                document.querySelectorAll('.faq-question').forEach(item => {
+                    item.classList.remove('active');
+                });
+                
+                // Toggle current answer
+                if (!isActive) {
+                    question.classList.add('active');
+                    answer.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
